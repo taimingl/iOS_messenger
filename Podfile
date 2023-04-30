@@ -5,8 +5,12 @@ target 'iOS_messenger' do
   use_frameworks!
 
   # Pods for iOS_messenger
+# Firebase
 pod 'Firebase/Core'
 pod 'Firebase/Auth'
-pod 'Firebase/Database' 
+pod 'Firebase/Database'
+
+# Facebook
+pod 'FBSDKLoginKit'
 
 end
