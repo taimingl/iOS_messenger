@@ -11,6 +11,6 @@ pod 'Firebase/Auth'
 pod 'Firebase/Database'
 
 # Facebook
-pod 'FBSDKLoginKit'
+pod 'FBSDKLoginKit' 
 
 end

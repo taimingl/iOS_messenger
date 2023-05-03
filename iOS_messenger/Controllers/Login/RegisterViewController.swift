@@ -103,10 +103,6 @@ class RegisterViewController: UIViewController {
         title = "Register"
         view.backgroundColor = .cyan
         navigationController?.navigationBar.backgroundColor = .systemYellow
-        navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Register",
-                                                            style: .done,
-                                                            target: self,
-                                                            action: #selector(didTapRegister))
         
         registerButton.addTarget(self,
                                  action: #selector(registerButtonTapped),
@@ -233,13 +229,6 @@ class RegisterViewController: UIViewController {
                                       style: .cancel,
                                       handler: nil))
         present(alert, animated: true)
-    }
-    
-    
-    @objc private func didTapRegister() {
-        let vc = RegisterViewController()
-        vc.title = "Create Account"
-        navigationController?.pushViewController(vc, animated: true)
     }
 }
 
