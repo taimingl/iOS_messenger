@@ -7,7 +7,9 @@
 
 import UIKit
 import FirebaseAuth
+import FirebaseCore
 import FBSDKLoginKit
+import GoogleSignIn
 
 class LoginViewController: UIViewController {
     
@@ -73,6 +75,12 @@ class LoginViewController: UIViewController {
         return button
     }()
     
+    // Google login button
+    private let googleSignButton: GIDSignInButton = {
+        let button = GIDSignInButton()
+        return button
+    }()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         title = "Log In"
@@ -91,6 +99,11 @@ class LoginViewController: UIViewController {
         passwordField.delegate = self
         fbLoginButton.delegate = self
         
+        // Google sign in button delegate
+        googleSignButton.addTarget(self,
+                                   action: #selector(handleGoogleLoginButton),
+                                   for: .touchUpInside)
+        
         // Add subviews
         view.addSubview(scrollView)
         scrollView.addSubview(imageView)
@@ -98,6 +111,62 @@ class LoginViewController: UIViewController {
         scrollView.addSubview(passwordField)
         scrollView.addSubview(loginButton)
         scrollView.addSubview(fbLoginButton)
+        scrollView.addSubview(googleSignButton)
+    }
+    
+    @objc private func handleGoogleLoginButton() {
+        guard let clientID = FirebaseApp.app()?.options.clientID else { return }
+        
+        // Create Goole Sign In configuration object.
+        let config = GIDConfiguration(clientID: clientID)
+        GIDSignIn.sharedInstance.configuration = config
+        
+        // Start the sign in flow
+        GIDSignIn.sharedInstance.signIn(withPresenting: self) { [weak self] result, error in
+            guard error == nil else {
+                print("Failed to sign in with google with error: \(error.debugDescription)")
+                return
+            }
+            guard let user = result?.user, let idToken = user.idToken?.tokenString else {
+                print("failed to get the user object from google")
+                return
+            }
+            guard let emailAddress = user.profile?.email as? String,
+                  let firstName = user.profile?.givenName as? String,
+                  let lastName = user.profile?.familyName as? String else {
+                print("failed to get user details from google")
+                return
+            }
+            
+            // Create firebase user object if new
+            DatabaseManager.shared.userExists(with: emailAddress, completion: { exists in
+                if !exists {
+                    DatabaseManager.shared.insertUser(with: ChatAppUser(firstName: firstName,
+                                                                        lastName: lastName,
+                                                                        emailAddress: emailAddress))
+                }
+            })
+            
+            let credential = GoogleAuthProvider.credential(withIDToken: idToken,
+                                                           accessToken: user.accessToken.tokenString)
+            // Trade google credential to sign in to firebase
+            FirebaseAuth.Auth.auth().signIn(with: credential,
+                                            completion: { [weak self] authResult, error in
+                guard let strongSelf = self else {
+                    return
+                }
+                guard authResult != nil, error == nil else {
+                    if let error = error {
+                        print("google credential login failed. MFA may be needed \(error)")
+                    }
+                    return
+                }
+                
+                print("successfully logged user in with firebase")
+                strongSelf.navigationController?.dismiss(animated: true,
+                                                         completion: nil)
+            })
+        }
     }
     
     override func viewDidLayoutSubviews() {
@@ -122,6 +191,10 @@ class LoginViewController: UIViewController {
                                    height: 52)
         fbLoginButton.frame = CGRect(x: 30,
                                      y: loginButton.bottom+10,
+                                     width: scrollView.width-60,
+                                     height: 52)
+        googleSignButton.frame = CGRect(x: 30,
+                                     y: fbLoginButton.bottom+10,
                                      width: scrollView.width-60,
                                      height: 52)
     }
