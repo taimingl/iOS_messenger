@@ -134,19 +134,22 @@ class LoginViewController: UIViewController {
                 print("failed to get the user object from google")
                 return
             }
-            guard let emailAddress = user.profile?.email as? String,
+            guard let email = user.profile?.email as? String,
                   let firstName = user.profile?.givenName as? String,
                   let lastName = user.profile?.familyName as? String else {
                 print("failed to get user details from google")
                 return
             }
             
+            // Cache user info to device
+            UserDefaults.standard.set(email, forKey: "email")
+            
             // Create firebase user object if new
-            DatabaseManager.shared.userExists(with: emailAddress, completion: { exists in
+            DatabaseManager.shared.userExists(with: email, completion: { exists in
                 if !exists {
                     let chatUser = ChatAppUser(firstName: firstName,
                                                lastName: lastName,
-                                               emailAddress: emailAddress)
+                                               emailAddress: email)
                     DatabaseManager.shared.insertUser(with: chatUser,
                                                       completion: { success in
                         if success {
@@ -270,10 +273,14 @@ class LoginViewController: UIViewController {
             guard let result = authResult,
                   error == nil else {
                 print("error signing in the suer")
+                strongSelf.alertUserLoginError()
                 return
             }
             
             let user = result.user
+            // Cache user info to device to fast access
+            UserDefaults.standard.set(email, forKey: "email")
+            
             print("Logged in user: \(user)")
             strongSelf.navigationController?.dismiss(animated: true,
                                                      completion: nil)
@@ -345,6 +352,9 @@ extension LoginViewController: LoginButtonDelegate {
                 print("failed to get email and name from fb result")
                 return
             }
+            
+            // Cache user info to device
+            UserDefaults.standard.set(email, forKey: "email")
             
             DatabaseManager.shared.userExists(with: email, completion: { exists in
                 if !exists {

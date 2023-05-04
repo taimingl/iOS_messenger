@@ -14,6 +14,12 @@ final class DatabaseManager {
     static let shared = DatabaseManager()
     
     private let database = Database.database().reference()
+    
+    static func safeEmail(emailAddress: String) -> String {
+        var safeEmail = emailAddress.replacingOccurrences(of: ".", with: "-")
+        safeEmail = safeEmail.replacingOccurrences(of: "@", with: "-")
+        return safeEmail
+    }
 
 }
 
@@ -38,8 +44,7 @@ extension DatabaseManager {
     
     /// Inserts new user to database
     public func insertUser(with user: ChatAppUser,
-                           completion: @escaping (Bool) -> Void
-    ) {
+                           completion: @escaping (Bool) -> Void) {
         database.child(user.safeEmail).setValue([
             "first_name": user.firstName,
             "last_name": user.lastName
@@ -49,10 +54,73 @@ extension DatabaseManager {
                 completion(false)
                 return
             }
-            completion(true)
+            
+            // Append new user to database' users array. if first user, create the array
+            /**
+             users => [
+                 [
+                     "name": xxx,
+                     "safe_email": xxx
+                 ],
+                 [
+                     "name": xxx,
+                     "safe_email": xxx
+                 ]
+             ]
+             */
+            self.database.child("users").observeSingleEvent(of: .value, with: {snapshot in
+                if var usersCollection = snapshot.value as? [[String: String]] {
+                    // append to usersCollection
+                    let newElement: [String: String] = [
+                        "name": user.firstName + " " + user.lastName,
+                        "email": user.emailAddress
+                    ]
+                    usersCollection.append(newElement)
+                    self.database.child("users").setValue(usersCollection,
+                                                          withCompletionBlock: {error, _ in
+                        guard error == nil else {
+                            print("failed to append new user to users collection array in firebase database")
+                            completion(false)
+                            return
+                        }
+                        completion(true)
+                    })
+                } else {
+                    // Create the usersCollection
+                    let newCollection: [[String: String]] = [
+                        [
+                            "name": user.firstName + " " + user.lastName,
+                            "email": user.safeEmail
+                        ]
+                    ]
+                    self.database.child("users").setValue(newCollection,
+                                                          withCompletionBlock: {error, _ in
+                        guard error == nil else {
+                            print("failed to create user collections in firebase database")
+                            completion(false)
+                            return
+                        }
+                        completion(true)
+                    })
+                }
+            })
         })
     }
-
+    
+    public func getAllUsers(completion: @escaping (Result<[[String: String]], Error>) -> Void) {
+        database.child("users").observeSingleEvent(of: .value,
+                                                   with: {snapshot in
+            guard let value = snapshot.value as? [[String: String]] else {
+                completion(.failure(DatabaseError.failedToFetch))
+                return
+            }
+            completion(.success(value))
+        })
+    }
+    
+    public enum DatabaseError: Error {
+        case failedToFetch
+    }
 }
 
 struct ChatAppUser {
