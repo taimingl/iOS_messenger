@@ -14,6 +14,12 @@ pod 'Firebase/Database'
 pod 'FBSDKLoginKit'
 
 # Google Sign In
-pod 'GoogleSignIn' 
+pod 'GoogleSignIn'
+
+# Chat dependencies
+pod 'MessageKit'
+pod 'JGProgressHUD'
+pod 'RealmSwift'
+pod 'SDWebImage'
 
 end

@@ -10,8 +10,11 @@ import FirebaseAuth
 import FirebaseCore
 import FBSDKLoginKit
 import GoogleSignIn
+import JGProgressHUD
 
 class LoginViewController: UIViewController {
+    
+    private let spinner = JGProgressHUD(style: .dark)
     
     private let scrollView: UIScrollView = {
         let scrollView = UIScrollView()
@@ -211,6 +214,8 @@ class LoginViewController: UIViewController {
             return
         }
         
+        spinner.show(in: view)
+        
         // Firebase login
         FirebaseAuth.Auth.auth().signIn(withEmail: email,
                                         password: password,
@@ -218,6 +223,12 @@ class LoginViewController: UIViewController {
             guard let strongSelf = self else {
                 return
             }
+            
+            // Call back function works on the background thread. UI changes should be on main thread
+            DispatchQueue.main.async {
+                strongSelf.spinner.dismiss()
+            }
+            
             guard let result = authResult,
                   error == nil else {
                 print("error signing in the suer")
