@@ -83,7 +83,8 @@ class ChatViewController: MessagesViewController {
         super.init(nibName: nil, bundle: nil)
         if let conversationId = conversationId {
             print("starting to listen for messages \(conversationId)")
-            listenForMessages(conversationId: conversationId)
+            listenForMessages(conversationId: conversationId,
+                              shouldScrollToBottom: true)
         }
     }
     
@@ -114,7 +115,8 @@ class ChatViewController: MessagesViewController {
         messageInputBar.inputTextView.becomeFirstResponder()
     }
     
-    private func listenForMessages(conversationId: String) {
+    private func listenForMessages(conversationId: String,
+                                   shouldScrollToBottom: Bool) {
         DatabaseManager.shared.getAllMessagesForConversation(with: conversationId,
                                                              completion: { [weak self] result in
             switch result {
@@ -125,6 +127,9 @@ class ChatViewController: MessagesViewController {
                 self?.messages = messages
                 DispatchQueue.main.async {
                     self?.messagesCollectionView.reloadDataAndKeepOffset()
+                    if shouldScrollToBottom {
+                        self?.messagesCollectionView.scrollToBottom()
+                    }
                 }
             case .failure(let error):
                 print("failed to get messages: \(error)")
