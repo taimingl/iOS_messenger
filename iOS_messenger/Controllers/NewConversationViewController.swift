@@ -10,6 +10,8 @@ import JGProgressHUD
 
 class NewConversationViewController: UIViewController {
     
+    public var completion: (([String: String]) -> (Void))?
+    
     private let spinner = JGProgressHUD(style: .dark)
     
     private var users = [[String: String]]()
@@ -162,7 +164,11 @@ extension NewConversationViewController: UITableViewDelegate, UITableViewDataSou
         tableView.deselectRow(at: indexPath, animated: true)
         
         // start conversation
-        let vc = ChatViewController()
+        let targetUserData = results[indexPath.row]
+        dismiss(animated: true, completion: {[weak self] in
+            self?.completion?(targetUserData)
+        })
+        let vc = ChatViewController(with: "fake@gmail.comch", id: "")
         vc.title = "New Chat"
         vc.navigationItem.largeTitleDisplayMode = .never
         navigationController?.pushViewController(vc, animated: true)

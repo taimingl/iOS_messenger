@@ -144,9 +144,14 @@ class LoginViewController: UIViewController {
             // Cache user info to device
             UserDefaults.standard.set(email, forKey: "email")
             
+            
+            
             // Create firebase user object if new
-            DatabaseManager.shared.userExists(with: email, completion: { exists in
+            DatabaseManager.shared.userExists(with: email,
+                                              completion: { exists in
+                print(DatabaseManager.safeEmail(emailAddress: email))
                 if !exists {
+                    print("singing up with a new user")
                     let chatUser = ChatAppUser(firstName: firstName,
                                                lastName: lastName,
                                                emailAddress: email)
