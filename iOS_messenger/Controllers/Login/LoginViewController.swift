@@ -143,10 +143,15 @@ class LoginViewController: UIViewController {
             
             // Cache user info to device
             UserDefaults.standard.set(email, forKey: "email")
+            UserDefaults.standard.set("\(firstName) \(lastName)", forKey: "userName")
+            
             
             // Create firebase user object if new
-            DatabaseManager.shared.userExists(with: email, completion: { exists in
+            DatabaseManager.shared.userExists(with: email,
+                                              completion: { exists in
+                print(DatabaseManager.safeEmail(emailAddress: email))
                 if !exists {
+                    print("singing up with a new user")
                     let chatUser = ChatAppUser(firstName: firstName,
                                                lastName: lastName,
                                                emailAddress: email)
@@ -278,8 +283,24 @@ class LoginViewController: UIViewController {
             }
             
             let user = result.user
+            let safeEmail = DatabaseManager.safeEmail(emailAddress: email)
+            DatabaseManager.shared.getDataFor(path: safeEmail,
+                                              completion: { [weak self] result in
+                switch result {
+                case .success(let data):
+                    guard let userData = data as? [String: Any],
+                          let firstname = userData["first_name"] as? String,
+                          let lastname = userData["last_name"] as? String else {
+                        return
+                    }
+                    UserDefaults.standard.set("\(firstname) \(lastname)", forKey: "userName")
+                case .failure(let error):
+                    print("failed to read data with error: \(error)")
+                }
+            })
             // Cache user info to device to fast access
             UserDefaults.standard.set(email, forKey: "email")
+            
             
             print("Logged in user: \(user)")
             strongSelf.navigationController?.dismiss(animated: true,
@@ -355,6 +376,7 @@ extension LoginViewController: LoginButtonDelegate {
             
             // Cache user info to device
             UserDefaults.standard.set(email, forKey: "email")
+            UserDefaults.standard.set("\(firstName) \(lastName)", forKey: "userName")
             
             DatabaseManager.shared.userExists(with: email, completion: { exists in
                 if !exists {
