@@ -66,13 +66,14 @@ class ChatViewController: MessagesViewController {
     private var messages = [Message]()
     
     private var selfSender: Sender? = {
-        guard let email = UserDefaults.standard.value(forKey: "email") as? String else {
+        guard let email = UserDefaults.standard.value(forKey: "email") as? String,
+              let currentUserName = UserDefaults.standard.value(forKey: "userName") as? String else {
             return nil
         }
         let safeEmail = DatabaseManager.safeEmail(emailAddress: email)
         let sender = Sender(photoURL: "",
                             senderId: safeEmail,
-                            displayName: "Joe Smith")
+                            displayName: currentUserName)
         return sender
     }()
     
@@ -148,18 +149,19 @@ extension ChatViewController: InputBarAccessoryViewDelegate {
         }
         
         print("sending \(text)")
+        let message = Message(sender: selfSender,
+                              messageId: messageId,
+                              sentDate: Date(),
+                              kind: .text(text))
         // Send msg
         if isNewConversation {
             // create convo in databdase
-            let message = Message(sender: selfSender,
-                                  messageId: messageId,
-                                  sentDate: Date(),
-                                  kind: .text(text))
             DatabaseManager.shared.createNewConversation(with: otherUserEmail,
                                                          otherUserName: self.title ?? "User",
                                                          firstMessage: message,
-                                                         completion: { success in
+                                                         completion: { [weak self] success in
                 if success {
+                    self?.isNewConversation = false
                     print("message sent")
                 } else {
                     print("failed to send")
@@ -167,6 +169,21 @@ extension ChatViewController: InputBarAccessoryViewDelegate {
             })
         } else {
             // append to existing convo data
+            guard let conversationId = conversationId,
+                  let otherUserName = self.title else {
+                return
+            }
+            DatabaseManager.shared.sendMessage(to: conversationId,
+                                               otherUsername: otherUserName,
+                                               otherUserEmail: otherUserEmail,
+                                               message: message,
+                                               completion: {success in
+                if success {
+                    print("message sent successfully")
+                } else {
+                    print("message failed to send")
+                }
+            })
         }
     }
     
