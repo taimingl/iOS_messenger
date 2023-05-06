@@ -168,7 +168,7 @@ extension NewConversationViewController: UITableViewDelegate, UITableViewDataSou
         dismiss(animated: true, completion: {[weak self] in
             self?.completion?(targetUserData)
         })
-        let vc = ChatViewController(with: "fake@gmail.comch", id: "")
+        let vc = ChatViewController(with: "fake-gmail-com", id: "")
         vc.title = "New Chat"
         vc.navigationItem.largeTitleDisplayMode = .never
         navigationController?.pushViewController(vc, animated: true)
