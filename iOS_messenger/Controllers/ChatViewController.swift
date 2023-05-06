@@ -103,14 +103,6 @@ class ChatViewController: MessagesViewController {
         messageInputBar.delegate = self
     }
     
-//    override func viewDidLayoutSubviews() {
-//        super.viewDidLayoutSubviews()
-//        messagesCollectionView.frame = CGRect(x: 0,
-//                                              y: 100,
-//                                              width: view.width,
-//                                              height: view.height)
-//    }
-    
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         messageInputBar.inputTextView.becomeFirstResponder()
@@ -153,6 +145,7 @@ extension ChatViewController: InputBarAccessoryViewDelegate {
                               messageId: messageId,
                               sentDate: Date(),
                               kind: .text(text))
+        
         // Send msg
         if isNewConversation {
             // create convo in databdase

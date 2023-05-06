@@ -88,7 +88,7 @@ extension DatabaseManager {
                     // append to usersCollection
                     let newElement: [String: String] = [
                         "name": user.firstName + " " + user.lastName,
-                        "email": user.emailAddress
+                        "email": user.safeEmail
                     ]
                     usersCollection.append(newElement)
                     self.database.child("users").setValue(usersCollection,
