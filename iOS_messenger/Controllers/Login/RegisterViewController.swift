@@ -226,6 +226,10 @@ class RegisterViewController: UIViewController {
                                            lastName: lastName,
                                            emailAddress: email)
                 
+                // Cache user info to device
+                UserDefaults.standard.set(email, forKey: "email")
+                UserDefaults.standard.set("\(firstName) \(lastName)", forKey: "userName")
+                
                 DatabaseManager.shared.insertUser(with: chatUser,
                                                   completion: {success in
                     if success {
