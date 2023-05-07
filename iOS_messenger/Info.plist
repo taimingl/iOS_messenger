@@ -49,5 +49,11 @@
 			</array>
 		</dict>
 	</dict>
+	<key>NSCameraUsageDescription</key>
+	<string>Please allow access to user Camera</string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>Please allow access to Photo Library</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>Please allow access to Microphone for video</string>
 </dict>
 </plist>
