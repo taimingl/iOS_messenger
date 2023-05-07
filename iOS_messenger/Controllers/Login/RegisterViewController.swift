@@ -239,9 +239,10 @@ class RegisterViewController: UIViewController {
                             return
                         }
                         let fileName = chatUser.profilePictureFileName
-                        StorageManager.shared.uploadProfilePicture(with: data,
-                                                                   fileName: fileName,
-                                                                   completion: { result in
+                        StorageManager.shared.uploadPicture(with: data,
+                                                            databaseDir: "profile_images",
+                                                            fileName: fileName,
+                                                            completion: { result in
                             switch (result) {
                             case .success(let downloadUrl):
                                 UserDefaults.standard.setValue(downloadUrl,

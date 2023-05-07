@@ -177,9 +177,10 @@ class LoginViewController: UIViewController {
                                     }
                                     // upload downloaded pic to firebase
                                     let fileName = chatUser.profilePictureFileName
-                                    StorageManager.shared.uploadProfilePicture(with: data,
-                                                                               fileName: fileName,
-                                                                               completion: { result in
+                                    StorageManager.shared.uploadPicture(with: data,
+                                                                        databaseDir: "profile_images",
+                                                                        fileName: fileName,
+                                                                        completion: { result in
                                         switch (result) {
                                         case .success(let downloadUrl):
                                             UserDefaults.standard.setValue(downloadUrl,
@@ -401,9 +402,10 @@ extension LoginViewController: LoginButtonDelegate {
                                 print("Got picture bites from fb, uploading to firebase")
                                 // upload downloaded pic to firebase
                                 let fileName = chatUser.profilePictureFileName
-                                StorageManager.shared.uploadProfilePicture(with: data,
-                                                                           fileName: fileName,
-                                                                           completion: { result in
+                                StorageManager.shared.uploadPicture(with: data,
+                                                                    databaseDir: "profile_images",
+                                                                    fileName: fileName,
+                                                                    completion: { result in
                                     switch (result) {
                                     case .success(let downloadUrl):
                                         UserDefaults.standard.setValue(downloadUrl,
