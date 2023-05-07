@@ -254,7 +254,7 @@ class RegisterViewController: UIViewController {
                         })
                     }
                 })
-
+                NotificationCenter.default.post(name: .didLogInNofication, object: nil)
                 strongSelf.navigationController?.dismiss(animated: true,
                                                          completion: nil)
             })

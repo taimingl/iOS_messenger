@@ -34,3 +34,7 @@ extension UIView {
         return self.width + self.left
     }
 }
+
+extension Notification.Name {
+    static let didLogInNofication = Notification.Name("didLogInNotification")
+}

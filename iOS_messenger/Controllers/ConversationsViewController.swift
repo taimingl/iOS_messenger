@@ -28,6 +28,8 @@ class ConversationsViewController: UIViewController {
     
     private var conversations = [Conversation]()
     
+    private var loginObserver: NSObjectProtocol?
+    
     private let tableView: UITableView = {
         let table = UITableView()
         table.isHidden = true
@@ -55,7 +57,15 @@ class ConversationsViewController: UIViewController {
         view.addSubview(noConversationsLabel)
         fetchConversations()
         setupTableView()
-        startListeningConversations()
+        loginObserver = NotificationCenter.default.addObserver(forName: .didLogInNofication,
+                                                               object: nil,
+                                                               queue:  .main,
+                                                               using: { [weak self] _ in
+            guard let strongSelf = self else {
+                return
+            }
+            strongSelf.startListeningConversations()
+        })
     }
     
     override func viewDidLayoutSubviews() {
@@ -75,6 +85,8 @@ class ConversationsViewController: UIViewController {
             let nav = UINavigationController(rootViewController: vc)
             nav.modalPresentationStyle = .pageSheet
             present(nav, animated: true)
+        } else {
+            NotificationCenter.default.post(name: .didLogInNofication, object: nil)
         }
     }
     
@@ -96,10 +108,9 @@ class ConversationsViewController: UIViewController {
         present(navVC, animated: true)
     }
     
-    private func createNewConversation(result: [String: String]) {
-        guard let name = result["name"], let email = result["email"] else {
-            return
-        }
+    private func createNewConversation(result: SearchResult) {
+        let name = result.otherUserName
+        let email = result.otherUsuerEmail
         let vc = ChatViewController(with: email, id: nil)
         vc.isNewConversation = true
         vc.title = name
@@ -111,6 +122,10 @@ class ConversationsViewController: UIViewController {
         guard let email = UserDefaults.standard.value(forKey: "email") as? String else {
             return
         }
+        if let observer = loginObserver {
+            NotificationCenter.default.removeObserver(observer)
+        }
+        
         print("starting conversation fetch...")
         let safeEmail = DatabaseManager.safeEmail(emailAddress: email)
         DatabaseManager.shared.getAllConversations(for: safeEmail,
