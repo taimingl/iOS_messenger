@@ -7,6 +7,7 @@
 
 import Foundation
 import FirebaseDatabase
+import MessageKit
 
 final class DatabaseManager {
     
@@ -381,8 +382,6 @@ extension DatabaseManager {
         })
     }
     
-    // TODO: - Schema in userSafeEmail/conversations/ seems to be broken now.
-    
     /// Gets all messages for a given conversation
     public func getAllMessagesForConversation(with id: String,
                                               completion: @escaping (Result<[Message], Error>) -> Void) {
@@ -404,13 +403,37 @@ extension DatabaseManager {
                     print("failed to get all messages for convo id: \(id)")
                     return nil
                 }
+                
+                var kind: MessageKind?
+                
+                switch type {
+                case "text":
+                    kind = .text(content)
+                case "photo":
+                    guard let imageUrl = URL(string: content),
+                          let placeholder = UIImage(systemName: "plus") else {
+                        return nil
+                    }
+                    let media = Media(url: imageUrl,
+                                      image: nil,
+                                      placeholderImage: placeholder,
+                                      size: CGSize(width: 200, height: 200))
+                    kind = .photo(media)
+                default:
+                    break
+                }
+                
+                guard let kind = kind else {
+                    return nil
+                }
+                
                 let sender = Sender(photoURL: "",
                                     senderId: senderEmail,
                                     displayName: otherUserName)
                 return Message(sender: sender,
                                messageId: messageId,
                                sentDate: Date(),
-                               kind: .text(content))
+                               kind: kind)
             })
             completion(.success(messages))
         })
