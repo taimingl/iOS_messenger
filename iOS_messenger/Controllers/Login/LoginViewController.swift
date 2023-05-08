@@ -16,6 +16,8 @@ class LoginViewController: UIViewController {
     
     private let spinner = JGProgressHUD(style: .dark)
     
+    private var loginObserver: NSObjectProtocol?
+    
     private let scrollView: UIScrollView = {
         let scrollView = UIScrollView()
         scrollView.clipsToBounds = true
@@ -86,6 +88,17 @@ class LoginViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        loginObserver = NotificationCenter.default.addObserver(forName: .didLogInNofication,
+                                                               object: nil,
+                                                               queue: .main,
+                                                               using: { [weak self] _ in
+            guard let strongsSelf = self else{
+                return
+            }
+            strongsSelf.navigationController?.dismiss(animated: true, completion: nil)
+        })
+        
         title = "Log In"
         view.backgroundColor = .cyan
         navigationController?.navigationBar.backgroundColor = .systemYellow
@@ -115,6 +128,12 @@ class LoginViewController: UIViewController {
         scrollView.addSubview(loginButton)
         scrollView.addSubview(fbLoginButton)
         scrollView.addSubview(googleSignButton)
+    }
+    
+    deinit {
+        if let observer = loginObserver {
+            NotificationCenter.default.removeObserver(observer)
+        }
     }
     
     @objc private func handleGoogleLoginButton() {
@@ -213,6 +232,7 @@ class LoginViewController: UIViewController {
                 }
                 
                 print("successfully logged user in with firebase")
+                NotificationCenter.default.post(name: .didLogInNofication, object: nil)
                 strongSelf.navigationController?.dismiss(animated: true,
                                                          completion: nil)
             })
@@ -304,6 +324,7 @@ class LoginViewController: UIViewController {
             
             
             print("Logged in user: \(user)")
+            NotificationCenter.default.post(name: .didLogInNofication, object: nil)
             strongSelf.navigationController?.dismiss(animated: true,
                                                      completion: nil)
         })
@@ -435,6 +456,7 @@ extension LoginViewController: LoginButtonDelegate {
                 }
                 
                 print("successfully logged user in")
+                NotificationCenter.default.post(name: .didLogInNofication, object: nil)
                 strongSelf.navigationController?.dismiss(animated: true,
                                                          completion: nil)
             })

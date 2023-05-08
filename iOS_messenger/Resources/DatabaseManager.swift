@@ -399,6 +399,7 @@ extension DatabaseManager {
                       let isRead = dictionary["is_read"] as? Bool,
                       let otherUserName = dictionary["name"] as? String,
                       let senderEmail = dictionary["sender_email"] as? String,
+                      let date = ChatViewController.dateFormatter.date(from: dateString),
                       let type = dictionary["type"] as? String else {
                     print("failed to get all messages for convo id: \(id)")
                     return nil
@@ -419,7 +420,18 @@ extension DatabaseManager {
                                       placeholderImage: placeholder,
                                       size: CGSize(width: 200, height: 200))
                     kind = .photo(media)
+                case "video":
+                    guard let videoUrl = URL(string: content),
+                          let placeholder = UIImage(named: "video_placeholder") else {
+                        return nil
+                    }
+                    let media = Media(url: videoUrl,
+                                      image: nil,
+                                      placeholderImage: placeholder,
+                                      size: CGSize(width: 200, height: 200))
+                    kind = .video(media)
                 default:
+                    print(type)
                     break
                 }
                 
@@ -432,7 +444,7 @@ extension DatabaseManager {
                                     displayName: otherUserName)
                 return Message(sender: sender,
                                messageId: messageId,
-                               sentDate: Date(),
+                               sentDate: date,
                                kind: kind)
             })
             completion(.success(messages))
@@ -471,8 +483,10 @@ extension DatabaseManager {
                 if let targetUrl = mediaItem.url?.absoluteString {
                     messageContent = targetUrl
                 }
-            case .video(_):
-                break
+            case .video(let mediaItem):
+                if let targetUrl = mediaItem.url?.absoluteString {
+                    messageContent = targetUrl
+                }
             case .location(_):
                 break
             case .emoji(_):
