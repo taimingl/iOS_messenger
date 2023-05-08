@@ -8,6 +8,7 @@
 import Foundation
 import FirebaseDatabase
 import MessageKit
+import CoreLocation
 
 final class DatabaseManager {
     
@@ -431,6 +432,17 @@ extension DatabaseManager {
                                       placeholderImage: placeholder,
                                       size: CGSize(width: 200, height: 200))
                     kind = .video(media)
+                case "location":
+                    let components = content.components(separatedBy: ",")
+                    guard let longitude: Double = Double(components[0]),
+                          let latitude: Double = Double(components[1]) else {
+                        print("failed to parse received location message")
+                        return nil
+                    }
+                    let locationItem = Location(location: CLLocation(latitude: latitude, longitude: longitude),
+                                                size: CGSize(width: 200, height: 200))
+                    kind = .location(locationItem)
+                    break
                 default:
                     print(type)
                     break
@@ -493,8 +505,9 @@ extension DatabaseManager {
                 if let targetUrl = mediaItem.url?.absoluteString {
                     newMessageContent = targetUrl
                 }
-            case .location(_):
-                break
+            case .location(let locationData):
+                let location = locationData.location
+                newMessageContent = "\(location.coordinate.longitude),\(location.coordinate.latitude)"
             case .emoji(_):
                 break
             case .audio(_):
