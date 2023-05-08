@@ -27,6 +27,7 @@
 		76B5D29E2A04D015006DD086 /* ConversationTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 76B5D29D2A04D015006DD086 /* ConversationTableViewCell.swift */; };
 		76D455D52A03748C007EE67D /* ChatViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 76D455D42A03748C007EE67D /* ChatViewController.swift */; };
 		76D455D72A039C2D007EE67D /* StorageManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 76D455D62A039C2D007EE67D /* StorageManager.swift */; };
+		76F27E102A09691B00EACCE1 /* LocationPickerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 76F27E0F2A09691B00EACCE1 /* LocationPickerViewController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -53,6 +54,7 @@
 		76B5D29D2A04D015006DD086 /* ConversationTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConversationTableViewCell.swift; sourceTree = "<group>"; };
 		76D455D42A03748C007EE67D /* ChatViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatViewController.swift; sourceTree = "<group>"; };
 		76D455D62A039C2D007EE67D /* StorageManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StorageManager.swift; sourceTree = "<group>"; };
+		76F27E0F2A09691B00EACCE1 /* LocationPickerViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationPickerViewController.swift; sourceTree = "<group>"; };
 		B53747C71D05F25223AD642C /* Pods-iOS_messenger.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-iOS_messenger.release.xcconfig"; path = "Target Support Files/Pods-iOS_messenger/Pods-iOS_messenger.release.xcconfig"; sourceTree = "<group>"; };
 		EB5020F54F0914A52AAC6E8D /* Pods-iOS_messenger.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-iOS_messenger.debug.xcconfig"; path = "Target Support Files/Pods-iOS_messenger/Pods-iOS_messenger.debug.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -120,6 +122,7 @@
 				7665764C29FBA37E00B1EC73 /* NewConversationViewController.swift */,
 				7665764E29FBA39200B1EC73 /* ProfileViewController.swift */,
 				76D455D42A03748C007EE67D /* ChatViewController.swift */,
+				76F27E0F2A09691B00EACCE1 /* LocationPickerViewController.swift */,
 			);
 			path = Controllers;
 			sourceTree = "<group>";
@@ -319,6 +322,7 @@
 				76D455D52A03748C007EE67D /* ChatViewController.swift in Sources */,
 				7665764929FBA34600B1EC73 /* PhotoViewerViewController.swift in Sources */,
 				76D455D72A039C2D007EE67D /* StorageManager.swift in Sources */,
+				76F27E102A09691B00EACCE1 /* LocationPickerViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
