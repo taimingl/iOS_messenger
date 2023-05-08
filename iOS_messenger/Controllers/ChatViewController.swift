@@ -393,7 +393,7 @@ extension ChatViewController: InputBarAccessoryViewDelegate {
               let messageId = createMessageId() else {
             return
         }
-        
+        inputBar.inputTextView.text = ""
         print("sending \(text)")
         let message = Message(sender: selfSender,
                               messageId: messageId,
