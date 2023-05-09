@@ -55,6 +55,7 @@ class ProfileViewController: UIViewController {
                     return
                 }
                 
+                
                 // Log out Facebook
                 FBSDKLoginKit.LoginManager().logOut()
                 
@@ -65,6 +66,9 @@ class ProfileViewController: UIViewController {
                     try FirebaseAuth.Auth.auth().signOut()
                     // Signed out -> show signup/login page again
                     if FirebaseAuth.Auth.auth().currentUser == nil {
+                        // Purge cached user info
+                        UserDefaults.standard.setValue(nil, forKey: "email")
+                        UserDefaults.standard.setValue(nil, forKey: "userName")
                         let vc = LoginViewController()
                         let nav = UINavigationController(rootViewController: vc)
                         nav.modalPresentationStyle = .pageSheet

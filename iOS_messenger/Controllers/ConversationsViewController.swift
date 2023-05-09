@@ -170,14 +170,21 @@ class ConversationsViewController: UIViewController {
             case .success(let conversations):
                 print("successfully got conversation models")
                 guard !conversations.isEmpty else {
+//                    self?.noConversationsLabel.isHidden = true
+//                    self?.tableView.isHidden = false
                     return
                 }
                 self?.conversations = conversations
+//                self?.noConversationsLabel.isHidden = true
+//                self?.tableView.isHidden = false
                 DispatchQueue.main.async {
                     self?.tableView.reloadData()
                     self?.showNoConversationLabel()
                 }
             case .failure(let error):
+//                self?.noConversationsLabel.isHidden = true
+//                self?.tableView.isHidden = false
+                self?.showNoConversationLabel()
                 print("failed to get convos: \(error)")
             }
         })

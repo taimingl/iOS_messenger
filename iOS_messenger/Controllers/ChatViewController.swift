@@ -77,10 +77,14 @@ class ChatViewController: MessagesViewController {
         return formatter
     }()
     
+    // information of sender and recipient
     public let otherUserEmail: String
-    public var isNewConversation = false
-    private let conversationId: String?
+    private var otherUserPhotoUrl: URL?
+    private var currenUserPhotoUrl: URL?
     
+    // info of the conversation
+    public var isNewConversation = false
+    private var conversationId: String?
     private var messages = [Message]()
     
     private var selfSender: Sender? = {
@@ -409,6 +413,10 @@ extension ChatViewController: InputBarAccessoryViewDelegate {
                                                          completion: { [weak self] success in
                 if success {
                     self?.isNewConversation = false
+                    let newConversationId = "conversation-\(messageId)"
+                    self?.conversationId = newConversationId
+                    self?.listenForMessages(conversationId: newConversationId,
+                                            shouldScrollToBottom: true)
                     print("message sent")
                 } else {
                     print("failed to send")
@@ -487,6 +495,72 @@ extension ChatViewController: MessagesDataSource,
             break
         }
     }
+    
+    func backgroundColor(for message: MessageType, at indexPath: IndexPath, in messagesCollectionView: MessagesCollectionView) -> UIColor {
+        let sender = message.sender
+        if sender.senderId == selfSender?.senderId {
+            // message to be sent
+            return .link
+        }
+        
+        // received message
+        return .secondarySystemBackground
+    }
+    
+    func configureAvatarView(_ avatarView: AvatarView,
+                             for message: MessageType,
+                             at indexPath: IndexPath,
+                             in messagesCollectionView: MessagesCollectionView) {
+        let sender = message.sender
+        
+        // check who is the message from
+        if sender.senderId == selfSender?.senderId {
+            // show currentUserPhoto from URL, otherwise fetch it
+            if let currenUserPhotoUrl = self.currenUserPhotoUrl {
+                avatarView.sd_setImage(with: currenUserPhotoUrl, completed: nil)
+            } else {
+                // fetch the url
+                guard let currenUserEmail = UserDefaults.standard.value(forKey: "email") as? String else {
+                    return
+                }
+                let currentUserSafeEmail = DatabaseManager.safeEmail(emailAddress: currenUserEmail)
+                let path = "profile_images/\(currentUserSafeEmail)_profile_picture.png"
+                StorageManager.shared.downloadURL(for: path,
+                                                  completion: { [weak self] result in
+                    switch result {
+                    case .success(let url):
+                        self?.currenUserPhotoUrl = url
+                        DispatchQueue.main.async {
+                            avatarView.sd_setImage(with: url, completed: nil)
+                        }
+                    case .failure(_):
+                        print("failed to get profile image download url when setting up avatar for sender")
+                    }
+                })
+            }
+        } else {
+            // show otherUserPhoto
+            if let otherUserPhotoUrl = self.otherUserPhotoUrl {
+                avatarView.sd_setImage(with: otherUserPhotoUrl, completed: nil)
+            } else {
+                // fetch the url
+                let otherUserSafeEmail = DatabaseManager.safeEmail(emailAddress: self.otherUserEmail)
+                let path = "profile_images/\(otherUserSafeEmail)_profile_picture.png"
+                StorageManager.shared.downloadURL(for: path,
+                                                  completion: { [weak self] result in
+                    switch result {
+                    case .success(let url):
+                        self?.otherUserPhotoUrl = url
+                        DispatchQueue.main.async {
+                            avatarView.sd_setImage(with: url, completed: nil)
+                        }
+                    case .failure(_):
+                        print("failed to get profile image download url when setting up avatar for sender")
+                    }
+                })
+            }
+        }
+    }
 
 }
 
@@ -500,9 +574,6 @@ extension ChatViewController: MessageCellDelegate {
         if case let .location(locationitem) = message.kind {
             let coordinates = locationitem.location.coordinate
             let vc = LocationPickerViewController(coordinates: coordinates)
-//            let pin = MKPointAnnotation()
-//            pin.coordinate = locationitem.location.coordinate
-//            vc.map.addAnnotation(pin)
             vc.title = "Localtion"
             self.navigationController?.pushViewController(vc, animated: true)
         }
