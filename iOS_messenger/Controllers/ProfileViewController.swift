@@ -12,18 +12,7 @@ import GoogleSignIn
 import SDWebImage
 
 
-enum ProfileViewModelType {
-    case info
-    case logout
-}
-
-struct ProfileViewModel {
-    let viewModelType: ProfileViewModelType
-    let title: String
-    let handler: (() -> Void)? // handling when user taps the cell
-}
-
-class ProfileViewController: UIViewController {
+final class ProfileViewController: UIViewController {
     
     @IBOutlet var tableView: UITableView!
     

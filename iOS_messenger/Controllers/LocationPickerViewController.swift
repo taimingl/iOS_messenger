@@ -10,7 +10,7 @@ import CoreLocation
 import MapKit
 
 
-class LocationPickerViewController: UIViewController {
+final class LocationPickerViewController: UIViewController {
     
     private let map: MKMapView = {
         let map = MKMapView()

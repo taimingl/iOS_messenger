@@ -28,8 +28,8 @@ final class DatabaseManager {
 extension DatabaseManager {
     
     public func getDataFor(path: String, completion: @escaping (Result<Any, Error>) -> Void) {
-        self.database.child("\(path)").observeSingleEvent(of: .value,
-                                                          with: {snapshot in
+        database.child("\(path)").observeSingleEvent(of: .value,
+                                                     with: {snapshot in
             guard let value = snapshot.value else {
                 completion(.failure(DatabaseError.failedToFetch))
                 return
@@ -64,8 +64,8 @@ extension DatabaseManager {
         database.child(user.safeEmail).setValue([
             "first_name": user.firstName,
             "last_name": user.lastName
-        ], withCompletionBlock: { error, _ in
-            guard error == nil else {
+        ], withCompletionBlock: { [weak self] error, _ in
+            guard let strongSelf = self, error == nil else {
                 print("failed to write to database")
                 completion(false)
                 return
@@ -81,11 +81,11 @@ extension DatabaseManager {
                  ],
                  [
                      "name": xxx,
-                     "safe_email": xxx
-                 ]
+             "safe_email": xxx
+             ]
              ]
              */
-            self.database.child("users").observeSingleEvent(of: .value, with: {snapshot in
+            strongSelf.database.child("users").observeSingleEvent(of: .value, with: {snapshot in
                 if var usersCollection = snapshot.value as? [[String: String]] {
                     // append to usersCollection
                     let newElement: [String: String] = [
@@ -93,8 +93,8 @@ extension DatabaseManager {
                         "email": user.safeEmail
                     ]
                     usersCollection.append(newElement)
-                    self.database.child("users").setValue(usersCollection,
-                                                          withCompletionBlock: {error, _ in
+                    strongSelf.database.child("users").setValue(usersCollection,
+                                                                withCompletionBlock: {error, _ in
                         guard error == nil else {
                             print("failed to append new user to users collection array in firebase database")
                             completion(false)
@@ -110,8 +110,8 @@ extension DatabaseManager {
                             "email": user.safeEmail
                         ]
                     ]
-                    self.database.child("users").setValue(newCollection,
-                                                          withCompletionBlock: {error, _ in
+                    strongSelf.database.child("users").setValue(newCollection,
+                                                                withCompletionBlock: {error, _ in
                         guard error == nil else {
                             print("failed to create user collections in firebase database")
                             completion(false)
@@ -579,8 +579,8 @@ extension DatabaseManager {
                                          recipientName: String,
                                          conversationId: String,
                                          completion: @escaping (Bool) -> Void) {
-        self.database.child("\(senderSafeEmail)/conversations").observeSingleEvent(of: .value,
-                                                                                 with: {snapshot in
+        database.child("\(senderSafeEmail)/conversations").observeSingleEvent(of: .value,
+                                                                                 with: { [weak self] snapshot in
             /**
              3 cases:
                 A: current user has conversations array and finds target conversation in this array -> update the entry
@@ -619,8 +619,8 @@ extension DatabaseManager {
                 ]
             }
             
-            self.database.child("\(senderSafeEmail)/conversations").setValue(databaseConversationEntry,
-                                                                             withCompletionBlock: {error, _ in
+            self?.database.child("\(senderSafeEmail)/conversations").setValue(databaseConversationEntry,
+                                                                              withCompletionBlock: {error, _ in
                 guard error == nil else {
                     print("failed to set current user latest msg")
                     completion(false)

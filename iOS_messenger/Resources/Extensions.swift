@@ -11,27 +11,27 @@ import UIKit
 
 extension UIView {
     public var width: CGFloat {
-        return self.frame.size.width
+        return frame.size.width
     }
     
     public var height: CGFloat {
-        return self.frame.size.height
+        return frame.size.height
     }
     
     public var top: CGFloat {
-        return self.frame.origin.y
+        return frame.origin.y
     }
     
     public var bottom: CGFloat {
-        return self.height + self.top
+        return height + top
     }
     
     public var left: CGFloat {
-        return self.frame.origin.x
+        return frame.origin.x
     }
     
     public var right: CGFloat {
-        return self.width + self.left
+        return width + left
     }
 }
 

@@ -50,7 +50,7 @@ class NewConversationCell: UITableViewCell {
     }
     
     public func configure(with model: SearchResult) {
-        self.userNameLabel.text = model.otherUserName
+        userNameLabel.text = model.otherUserName
         
         let path = "profile_images/\(model.otherUsuerEmail)_profile_picture.png"
         StorageManager.shared.downloadURL(for: path,
